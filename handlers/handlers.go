@@ -1,4 +1,4 @@
-package urlsh
+package handlers
 
 import (
 	"net/http"
@@ -11,7 +11,12 @@ import (
 // If the path is not provided in the map, then the fallback
 // http.Handler will be called instead.
 func MapHandler(pathsToUrls map[string]string, fallback http.Handler) http.HandlerFunc {
-	//	TODO: Implement this...
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if realURL, ok := pathsToUrls[r.URL.Path]; ok {
+			http.Redirect(w, r, realURL, http.StatusSeeOther)
+		}
+		fallback.ServeHTTP(w, r)
+	})
 	return nil
 }
 
