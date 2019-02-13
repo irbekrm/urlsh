@@ -3,35 +3,35 @@ package main
 import (
 	"fmt"
 	"net/http"
-
-        "github/irbekrm/urlsh/handlers"
+	"github/irbekrm/urlsh/handlers"
 )
 
 func main() {
 	mux := defaultMux()
 
-	// Build the MapHandler using the mux as the fallback
 	pathsToUrls := map[string]string{
-		"/clouds":  "https://en.wikipedia.org/wiki/List_of_cloud_types",
-		"/medium": "https://medium.com",
-		"/godocs": "https://golang.org/doc/",
+		"/ny": "https://www.newyorker.com",
+		"/rl": "https://www.rigaslaiks.lv",
+		"/gr": "https://www.goodreads.com",
 	}
 	mapHandler := handlers.MapHandler(pathsToUrls, mux)
 
-	// Build the YAMLHandler using the mapHandler as the
-	// fallback
-//	yaml := `
-//- path: /urlshort
-//  url: https://github.com/gophercises/urlshort
-//- path: /urlshort-final
-//  url: https://github.com/gophercises/urlshort/tree/solution
-//`
-	//yamlHandler, err := handlers.YAMLHandler([]byte(yaml), mapHandler)
-	//if err != nil {
-	//	panic(err)
-	//}
+	yaml := `
+- "path": "/clouds"
+  "url": "https://en.wikipedia.org/wiki/List_of_cloud_types"
+- "path": "/medium"
+  "url": "https://medium.com"
+- "path": "/godocs"
+  "url": "https://golang.org/doc/"
+- "path": "/yml"
+  "url": "https://en.wikipedia.org/wiki/YAML"
+`
+	yamlHandler, err := handlers.YAMLHandler([]byte(yaml), mapHandler)
+	if err != nil {
+		panic(err)
+	}
 	fmt.Println("Starting the server on :8080")
-	http.ListenAndServe(":8080", mapHandler)
+	http.ListenAndServe(":8080", yamlHandler)
 }
 
 func defaultMux() *http.ServeMux {
