@@ -48,3 +48,31 @@ func TestMapHandler(t *testing.T) {
 	}
 
 }
+
+func TestYamlHandler(t *testing.T) {
+	testdata := `
+- "path": "/rocks"
+  "url": "https://en.wikipedia.org/wiki/List_of_rock_types"
+`
+	testMux := func() *http.ServeMux {
+		mux := http.NewServeMux()
+		mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request){
+			fmt.Fprintln(w, "Testing")
+		})
+		return mux
+	}
+	req := httptest.NewRequest("GET", "/rocks", nil)
+	rr := httptest.NewRecorder()
+	yamlHandler, err := YAMLHandler([]byte(testdata), testMux())
+	if err != nil {
+		t.Fatal(err)
+	}
+	yamlHandler.ServeHTTP(rr, req)
+
+	if status := rr.Code; status != http.StatusSeeOther {
+		t.Errorf("Status expected %v got %v", http.StatusSeeOther, status)
+	}
+	if location := rr.Result().Header["Location"][0]; location != "https://en.wikipedia.org/wiki/List_of_rock_types" {
+		t.Errorf("Expected location %v (redirect) got %v", "https://en.wikipedia.org/wiki/List_of_rock_types", rr.Result().Header["Location"])
+	}
+}
