@@ -43,6 +43,9 @@ func hello(w http.ResponseWriter, r *http.Request) {
 }
 
 func DataFromFile(path, fileType string, fallback http.Handler) (http.HandlerFunc, error) {
+	if !(fileType == "json" || fileType == "yaml") {
+		return nil, fmt.Errorf("Cannot parse file type [%v]\n", fileType)
+	}
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -57,8 +60,6 @@ func DataFromFile(path, fileType string, fallback http.Handler) (http.HandlerFun
 		return handlers.JSONHandler(fileContents, fallback)
 	case "yaml":
 		return handlers.YAMLHandler(fileContents, fallback)
-	default:
-		return nil, fmt.Errorf("Cannot parse file type [%v]\n", fileType)
 	}
 	return nil, nil
 	}
