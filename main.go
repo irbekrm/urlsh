@@ -22,7 +22,7 @@ func main() {
 
     //Uncomment to read urls from /data/urls.json
     filePath := dir + "/data/urls.json"
-    handler, err := DataFromFile(filePath, "json", mux)
+    handler, err := DataFromFile(filePath, "json", mux, fileOpener, fileReader)
 
 
 	if err != nil {
@@ -32,25 +32,15 @@ func main() {
 	http.ListenAndServe(":8080", handler)
 }
 
-func defaultMux() *http.ServeMux {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", hello)
-	return mux
-}
-
-func hello(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Hello, world!")
-}
-
-func DataFromFile(path, fileType string, fallback http.Handler) (http.HandlerFunc, error) {
+func DataFromFile(path, fileType string, fallback http.Handler, fileOpener func(string)(*os.File, error), fileReader func(*os.File)([]byte, error)) (http.HandlerFunc, error) {
 	if !(fileType == "json" || fileType == "yaml") {
 		return nil, fmt.Errorf("Cannot parse file type [%v]\n", fileType)
 	}
-	file, err := os.Open(path)
+	file, err := fileOpener(path)
 	if err != nil {
 		return nil, err
 	}
-	fileContents, err := ioutil.ReadAll(file)
+	fileContents, err := fileReader(file)
 	if err != nil {
 		return nil, err
 	}
@@ -62,4 +52,21 @@ func DataFromFile(path, fileType string, fallback http.Handler) (http.HandlerFun
 		return handlers.YAMLHandler(fileContents, fallback)
 	}
 	return nil, nil
-	}
+}
+
+func fileOpener(path string) (*os.File, error) {
+	return os.Open(path)
+}
+func fileReader(file *os.File) ([]byte, error) {
+	return ioutil.ReadAll(file)
+}
+
+func defaultMux() *http.ServeMux {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", hello)
+	return mux
+}
+
+func hello(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Hello, world!")
+}
