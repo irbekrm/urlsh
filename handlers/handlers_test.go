@@ -76,3 +76,31 @@ func TestYamlHandler(t *testing.T) {
 		t.Errorf("Expected location %v (redirect) got %v", "https://en.wikipedia.org/wiki/List_of_rock_types", rr.Result().Header["Location"])
 	}
 }
+
+func TestJSONHandler(t *testing.T) {
+	testdata := `
+    [{"path": "/gl", "url": "https://docs.gitlab.com/ee/README.html"}]
+    `
+	testMux := func() *http.ServeMux {
+		mux := http.NewServeMux()
+		mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request){
+			fmt.Fprintln(w, "Testing")
+		})
+		return mux
+	}
+
+	req := httptest.NewRequest("GET", "/gl", nil)
+	rr := httptest.NewRecorder()
+	jsonHandler, err := JSONHandler([]byte(testdata), testMux())
+	if err != nil {
+		t.Fatal(err)
+	}
+	jsonHandler.ServeHTTP(rr, req)
+
+	if status := rr.Code; status != http.StatusSeeOther {
+		t.Errorf("Status expected %v got %v", http.StatusSeeOther, status)
+	}
+	if location := rr.Result().Header["Location"][0]; location != "https://docs.gitlab.com/ee/README.html" {
+		t.Errorf("Expected location %v (redirect) got %v", "https://docs.gitlab.com/ee/README.html", rr.Result().Header["Location"])
+	}
+}
