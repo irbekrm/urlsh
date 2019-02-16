@@ -11,13 +11,6 @@ import (
 
 func main() {
 	mux := defaultMux()
-
-	pathsToUrls := map[string]string{
-		"/ny": "https://www.newyorker.com",
-		"/rl": "https://www.rigaslaiks.lv",
-		"/gr": "https://www.goodreads.com",
-	}
-	mapHandler := handlers.MapHandler(pathsToUrls, mux)
 	dir, err := os.Getwd()
 	if err != nil {
 		log.Fatalf("Failed to get current working directory, error: [%v]\n", err)
@@ -25,16 +18,16 @@ func main() {
 
 	// Uncomment to read urls from /data/urls.yaml
     //filePath := dir + "/data/urls.yaml"
-    //handler, err := DataFromFile(filePath, "yaml", mapHandler)
+    //handler, err := DataFromFile(filePath, "yaml", mux)
 
     //Uncomment to read urls from /data/urls.json
     filePath := dir + "/data/urls.json"
-    handler, err := DataFromFile(filePath, "json", mapHandler)
+    handler, err := DataFromFile(filePath, "json", mux)
 
 
-  if err != nil {
-  	log.Fatalf("Failed parsing urls, file: [%v], error: [%v]\n", filePath, err)
-  }
+	if err != nil {
+		log.Fatalf("Failed parsing urls, file: [%v], error: [%v]\n", filePath, err)
+	}
 	fmt.Println("Starting the server on :8080")
 	http.ListenAndServe(":8080", handler)
 }
