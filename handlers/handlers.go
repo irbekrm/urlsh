@@ -19,8 +19,11 @@ func YAMLHandler(yml []byte, fallback http.Handler) (http.HandlerFunc, error) {
 	tempSlice := make([]map[string]string, 10)
 	pathsToUrls := make(map[string]string)
     err := yaml.Unmarshal(yml, &tempSlice)
+    if err != nil {
+    	return nil, err
+	}
 	for _, v := range tempSlice {
 		pathsToUrls[v["path"]] = v["url"]
 	}
-	return MapHandler(pathsToUrls, fallback), err
+	return MapHandler(pathsToUrls, fallback), nil
 }
