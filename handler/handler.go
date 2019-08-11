@@ -2,9 +2,10 @@ package handler
 
 import (
 	"fmt"
-	"github/irbekrm/urlsh/datastore"
 	"log"
 	"net/http"
+
+	"github.com/irbekrm/urlsh/datastore"
 )
 
 type IHandler interface {

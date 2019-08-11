@@ -2,8 +2,6 @@ package handler
 
 import (
 	"net/http"
-
-	bolt "go.etcd.io/bbolt"
 )
 
 type BoltDBHandler struct {
@@ -11,9 +9,9 @@ type BoltDBHandler struct {
 }
 
 func (b *BoltDBHandler) Handle(fallback http.Handler) http.HandlerFunc {
-
+	return nil
 }
 
 func dbOpener(path string) error {
-	db, err := bolt.Open
+	return nil
 }

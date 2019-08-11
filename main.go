@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github/irbekrm/urlsh/handlers"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/irbekrm/urlsh/handlers"
 )
 
 func main() {
@@ -17,22 +18,21 @@ func main() {
 	}
 
 	// Uncomment to read urls from /data/urls.yaml
-    //filePath := dir + "/data/urls.yaml"
-    //handler, err := DataFromFile(filePath, "yaml", mux)
+	//filePath := dir + "/data/urls.yaml"
+	//handler, err := DataFromFile(filePath, "yaml", mux)
 
-    //Uncomment to read urls from /data/urls.json
-    filePath := dir + "/data/urls.json"
-    handler, err := DataFromFile(filePath, "json", mux, fileOpener, fileReader)
-
+	//Uncomment to read urls from /data/urls.json
+	filePath := dir + "/data/urls.json"
+	handler, err := DataFromFile(filePath, "json", mux, fileOpener, fileReader)
 
 	if err != nil {
 		log.Fatalf("Failed parsing urls, file: [%v], error: [%v]\n", filePath, err)
 	}
-	fmt.Println("Starting the server on :8080")
-	http.ListenAndServe(":8080", handler)
+	fmt.Println("Starting the server on :8081")
+	http.ListenAndServe(":8081", handler)
 }
 
-func DataFromFile(path, fileType string, fallback http.Handler, fileOpener func(string)(*os.File, error), fileReader func(*os.File)([]byte, error)) (http.HandlerFunc, error) {
+func DataFromFile(path, fileType string, fallback http.Handler, fileOpener func(string) (*os.File, error), fileReader func(*os.File) ([]byte, error)) (http.HandlerFunc, error) {
 	if !(fileType == "json" || fileType == "yaml") {
 		return nil, fmt.Errorf("Cannot parse file type [%v]\n", fileType)
 	}
