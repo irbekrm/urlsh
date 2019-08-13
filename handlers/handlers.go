@@ -2,10 +2,11 @@ package handlers
 
 import (
 	"encoding/json"
-	"gopkg.in/yaml.v2"
+	"fmt"
 	"net/http"
-)
 
+	"gopkg.in/yaml.v2"
+)
 
 func MapHandler(pathsToUrls map[string]string, fallback http.Handler) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

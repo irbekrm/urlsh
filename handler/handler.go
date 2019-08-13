@@ -16,10 +16,10 @@ type Handler struct {
 	ds datastore.DataStore
 }
 
-func NewHandler(dsType, dsPath string) (IHandler, error) {
-	ds, err := datastore.NewDataStore(dsType, dsPath)
+func New(dsType string) (IHandler, error) {
+	ds, err := datastore.New(dsType)
 	if err != nil {
-		return nil, fmt.Errorf("Failed initializing datastore [%s], error: [%v]", dsPath, err)
+		return nil, fmt.Errorf("Failed initializing datastore [%s], error: [%v]", dsType, err)
 	}
 	return &Handler{
 		ds: ds,
@@ -28,7 +28,7 @@ func NewHandler(dsType, dsPath string) (IHandler, error) {
 
 func (h *Handler) Handle(fallback http.Handler) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		realURL, found, err := h.ds.Search(r.URL.Path)
+		realURL, found, err := h.ds.Get(r.URL.Path)
 		if err != nil {
 			log.Fatalf("Failed searching path [%s], error: [%v]", r.URL.Path, err)
 		}
