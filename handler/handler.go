@@ -9,24 +9,26 @@ import (
 )
 
 type IHandler interface {
-	Handle(fallback http.Handler) http.HandlerFunc
+	Handle() http.HandlerFunc
 }
 
 type Handler struct {
-	ds datastore.DataStore
+	ds       datastore.DataStore
+	fallback http.Handler
 }
 
-func New(dsType string) (IHandler, error) {
+func New(dsType string, fallback http.Handler) (IHandler, error) {
 	ds, err := datastore.New(dsType)
 	if err != nil {
 		return nil, fmt.Errorf("Failed initializing datastore [%s], error: [%v]", dsType, err)
 	}
 	return &Handler{
-		ds: ds,
+		ds:       ds,
+		fallback: fallback,
 	}, nil
 }
 
-func (h *Handler) Handle(fallback http.Handler) http.HandlerFunc {
+func (h *Handler) Handle() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		realURL, found, err := h.ds.Get(r.URL.Path)
 		if err != nil {
@@ -35,6 +37,6 @@ func (h *Handler) Handle(fallback http.Handler) http.HandlerFunc {
 		if found {
 			http.Redirect(w, r, realURL, http.StatusSeeOther)
 		}
-		fallback.ServeHTTP(w, r)
+		h.fallback.ServeHTTP(w, r)
 	})
 }
