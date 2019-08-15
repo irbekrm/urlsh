@@ -2,7 +2,6 @@ package datastore
 
 import (
 	"fmt"
-	"os"
 	"strconv"
 
 	"github.com/go-redis/redis"
@@ -49,11 +48,4 @@ func (r *Redis) Get(url string) (string, bool, error) {
 		return "", false, errors.Wrap(err, "Failed getting a value from Redis")
 	}
 	return val, true, nil
-}
-
-func getEnvVar(n, v string) string {
-	if val := os.Getenv(n); val != "" {
-		return val
-	}
-	return v
 }

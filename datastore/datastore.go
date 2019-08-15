@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/pkg/errors"
 )
@@ -24,4 +25,11 @@ func New(dsType string) (DataStore, error) {
 		return nil, nil
 	}
 	return nil, nil
+}
+
+func getEnvVar(n, v string) string {
+	if val := os.Getenv(n); val != "" {
+		return val
+	}
+	return v
 }
